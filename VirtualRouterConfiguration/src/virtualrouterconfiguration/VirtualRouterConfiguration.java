@@ -25,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -54,20 +55,22 @@ public class VirtualRouterConfiguration extends Application {
         ObservaleStringBuffer buffer = new ObservaleStringBuffer();
         HBox hostnameConnectionbox = new HBox();
         TextField txtHostname = new TextField();
-
-        txtHostname.setPrefWidth(150);
+        TextField txtRegistryPort = new TextField();
+        txtRegistryPort.setPrefWidth(120);
+        txtHostname.setPrefWidth(120);
         Button btnConnect = new Button("Connect");
 
         btnConnect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
                 try {
-                    Registry registry = LocateRegistry.getRegistry("localhost", 1091);
+                    Registry registry = LocateRegistry.getRegistry("localhost", Integer.parseInt(txtRegistryPort.getText()));
 
                     configurationinterface = (ConfigurationInterface) registry.lookup(txtHostname.getText());
                     buffer.append("enter a port.................");
                     buffer.append(System.getProperty("line.separator"));
-
+                    txtRegistryPort.setDisable(true);
+                    stage.setTitle("Configuration of router " + configurationinterface.getHostname());
                     txtHostname.setDisable(true);
                 } catch (RemoteException ex) {
                     Logger.getLogger(VirtualRouterConfiguration.class.getName()).log(Level.SEVERE, null, ex);
@@ -76,7 +79,7 @@ public class VirtualRouterConfiguration extends Application {
                 }
             }
         });
-        hostnameConnectionbox.getChildren().addAll(txtHostname, btnConnect);
+        hostnameConnectionbox.getChildren().addAll(txtHostname, txtRegistryPort, btnConnect);
         ports = new ArrayList<>();
         neighbors = new ArrayList<>();
         establishedneighbors = new ArrayList<>();
@@ -84,7 +87,7 @@ public class VirtualRouterConfiguration extends Application {
         Label lbl = new Label("Router#");
         lbl.setPrefWidth(125);
         TextArea textArea = new TextArea();
-        textArea.setPrefHeight(650);
+        //textArea.setPrefHeight(650);
         textArea.setEditable(false);
         textArea.textProperty().bind(buffer);
 
@@ -353,21 +356,27 @@ public class VirtualRouterConfiguration extends Application {
                                         }
                                     }
                                     if (isneighbor) {
+//ip address 192.168.182.1 hostname r1 port 1
 
+///network 192.168.182.1 r1
+                                        boolean isestablishedalread = false;
                                         for (RoutingTableKey establishedneighbor : establishedneighbors) {
                                             if (establishedneighbor.equals(net)) {
                                                 //already established
+                                                isestablishedalread = true;
                                                 buffer.append(lbl.getText() + " " + command);
                                                 buffer.append(System.getProperty("line.separator"));
                                                 buffer.append("already established%unknown command or computer name , or unable to find computer address");
                                                 buffer.append(System.getProperty("line.separator"));
-                                            } else {
-                                                establishedneighbors.add(net);
-                                                buffer.append(lbl.getText() + " " + command);
-                                                buffer.append(System.getProperty("line.separator"));
-//                                            break;
                                             }
 
+                                        }
+                                        if (!isestablishedalread) {
+                                            buffer.append(lbl.getText() + " " + command);
+                                            buffer.append(System.getProperty("line.separator"));
+                                            establishedneighbors.add(net);
+                                            System.out.println("network added");
+//                                            break;
                                         }
                                     } else {//not neighbor so mamnu3
                                         buffer.append(lbl.getText() + " " + command);
@@ -425,7 +434,7 @@ public class VirtualRouterConfiguration extends Application {
         });
 
         VBox rr = new VBox(3);
-       
+        rr.setVgrow(textArea, Priority.ALWAYS);
         commandsbox.getChildren().addAll(lbl, txtcommand);
 
         rr.getChildren().addAll(hostnameConnectionbox, textArea, commandsbox);

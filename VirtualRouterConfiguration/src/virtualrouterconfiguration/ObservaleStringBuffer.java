@@ -5,13 +5,14 @@
  */
 package virtualrouterconfiguration;
 
+import java.io.Serializable;
 import javafx.beans.binding.StringBinding;
 
 /**
  *
  * @author maria afara
  */
-public class ObservaleStringBuffer extends StringBinding {
+public class ObservaleStringBuffer extends StringBinding implements Serializable {
 
     private final StringBuffer buffer = new StringBuffer();
 
