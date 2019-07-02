@@ -12,6 +12,5 @@ interface port1 (configuring interface port1)
       
 router rip
 
-  network (neig@) (neigh name)
-  
-  exit (-> initialiing the routing protocol with the entered networks)
+       network (neig@) (neigh name)
+       exit (-> initialiing the routing protocol with the entered networks)
