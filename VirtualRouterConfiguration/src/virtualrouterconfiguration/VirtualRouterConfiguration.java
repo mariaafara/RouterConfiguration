@@ -43,8 +43,8 @@ public class VirtualRouterConfiguration extends Application {
     String command;
     String lastCommand;
     ArrayList<Integer> ports;
-    ArrayList<RoutingTableKey> neighbors;
-    ArrayList<RoutingTableKey> establishedneighbors;
+
+    ArrayList<RoutingTableKey> networks;
     int port = -1;
 
     ConfigurationInterface configurationinterface;
@@ -70,8 +70,11 @@ public class VirtualRouterConfiguration extends Application {
                     Registry registry = LocateRegistry.getRegistry("localhost", Integer.parseInt(txtRegistryPort.getText()));
 
                     configurationinterface = (ConfigurationInterface) registry.lookup(txtHostname.getText());
-                    buffer.append("enter a port.................");
+                    buffer.append("Configuration interface created");
                     buffer.append(System.getProperty("line.separator"));
+                    buffer.append("Now you can start configuring the router " + txtHostname.getText());
+                    buffer.append(System.getProperty("line.separator"));
+
                     txtRegistryPort.setDisable(true);
                     stage.setTitle("Configuration of router " + configurationinterface.getHostname());
                     txtHostname.setDisable(true);
@@ -87,19 +90,18 @@ public class VirtualRouterConfiguration extends Application {
         });
         hostnameConnectionbox.getChildren().addAll(txtHostname, txtRegistryPort, btnConnect, ip);
         ports = new ArrayList<>();
-        neighbors = new ArrayList<>();
-        establishedneighbors = new ArrayList<>();
+
+        networks = new ArrayList<>();
 
         Label lbl = new Label("Router#");
         lbl.setPrefWidth(125);
         TextArea textArea = new TextArea();
-        //textArea.setPrefHeight(650);
+
         textArea.setEditable(false);
         textArea.textProperty().bind(buffer);
 
         HBox commandsbox = new HBox();
 
-        // buffer.append("Router#");
         txtcommand.setOnAction(e -> {
             command = txtcommand.getText();
             lastCommand = lbl.getText();
@@ -146,9 +148,12 @@ public class VirtualRouterConfiguration extends Application {
                                 System.out.println("size " + sizeofinterfaces);
                                 try {
                                     for (int j = 0; j < sizeofinterfaces - 1; j++) {
+                                        int porttoadd = Integer.parseInt(config_command_array[j + 1]);
+                                        if (!configurationinterface.checkPort(porttoadd)) {
+                                            ports.add(porttoadd);
+                                            System.out.println("->" + config_command_array[j + 1] + " added");
+                                        }
 
-                                        ports.add(Integer.parseInt(config_command_array[j + 1]));
-                                        System.out.println("->" + config_command_array[j + 1] + " added");
                                     }
                                     for (int k = 0; k < ports.size(); k++) {
 
@@ -286,14 +291,6 @@ public class VirtualRouterConfiguration extends Application {
                                     //initializeConx
                                     configurationinterface.initializeConnection(port, address, nexthostname, nextport);
 
-                                    ///hon bade ziddd l neighborsss
-                                    neighbors.add(new RoutingTableKey(address, nexthostname));
-//                                    for (RoutingTableKey neighbor : neighbors) {
-//                                        buffer.append(System.getProperty("line.separator"));
-//                                        buffer.append("-->" + neighbor.getIp() + " " + neighbor.getHostname());
-//                                        buffer.append(System.getProperty("line.separator"));
-//                                    }
-
                                     /////////////////
                                     buffer.append(lbl.getText() + " " + command);
                                     buffer.append(System.getProperty("line.separator"));
@@ -352,55 +349,51 @@ public class VirtualRouterConfiguration extends Application {
                                 try {
                                     InetAddress address = InetAddress.getByName(config_router_command_array[1]);
                                     String nexthostname = config_router_command_array[2];
-                                    ////iza m3moul establish abel aw la lnetwork 
-                                    boolean isneighbor = false, alreadyestblished = false;
                                     RoutingTableKey net = new RoutingTableKey(address, nexthostname);
-                                    for (RoutingTableKey neighbor : neighbors) {
-                                        //buffer.append("-->" + neighbor.getIp() + " " + neighbor.getHostname());
-                                        if (net.equals(neighbor)) {
-                                            isneighbor = true;
-                                            //  buffer.append("--is neigh--");
-                                        } else {
-                                            // buffer.append("--not neigh--");
-
-                                        }
-                                    }
-                                    if (isneighbor) {
-//ip address 192.168.182.1 hostname r1 port 1
-
-///network 192.168.182.1 r1
-                                        boolean isestablishedalread = false;
-                                        for (RoutingTableKey establishedneighbor : establishedneighbors) {
-                                            if (establishedneighbor.equals(net)) {
-                                                //already established
-                                                isestablishedalread = true;
-                                                buffer.append(lbl.getText() + " " + command);
-                                                buffer.append(System.getProperty("line.separator"));
-                                                buffer.append("already established%unknown command or computer name , or unable to find computer address");
-                                                buffer.append(System.getProperty("line.separator"));
-                                            }
-
-                                        }
-                                        if (!isestablishedalread) {
-                                            buffer.append(lbl.getText() + " " + command);
-                                            buffer.append(System.getProperty("line.separator"));
-                                            establishedneighbors.add(net);
-                                            System.out.println("network added");
-//                                            break;
-                                        }
-                                    } else {//not neighbor so mamnu3
+                                    //if its a neighbor but not established add to networks
+                                    if (!configurationinterface.checkEstablishedNeighbor(address, nexthostname)
+                                            && configurationinterface.checkNeighbor(address, nexthostname)) {
+                                        networks.add(net);
                                         buffer.append(lbl.getText() + " " + command);
                                         buffer.append(System.getProperty("line.separator"));
-                                        buffer.append("is neigh %unknown command or computer name , or unable to find computer address");
-                                        buffer.append(System.getProperty("line.separator"));
-
+                                       
                                     }
 
+                                    ////iza m3moul establish abel aw la lnetwork 
+//                                    if (configurationinterface.checkNeighbor(address, nexthostname)) {
+//                                        boolean isestablishedalread = false;
+//                                        for (RoutingTableKey establishedneighbor : establishedneighbors) {
+//                                            if (establishedneighbor.equals(net)) {
+//                                                //already established
+//                                                isestablishedalread = true;
+//                                                buffer.append(lbl.getText() + " " + command);
+//                                                buffer.append(System.getProperty("line.separator"));
+//                                                buffer.append("already established%unknown command or computer name , or unable to find computer address");
+//                                                buffer.append(System.getProperty("line.separator"));
+//                                            }
+//                                            
+//                                        }
+//                                        if (!isestablishedalread) {
+//                                            buffer.append(lbl.getText() + " " + command);
+//                                            buffer.append(System.getProperty("line.separator"));
+//                                            establishedneighbors.add(net);
+//                                            System.out.println("network added");
+////                                            break;
+//                                        }
+//                                    } else {//not neighbor so mamnu3
+//                                        buffer.append(lbl.getText() + " " + command);
+//                                        buffer.append(System.getProperty("line.separator"));
+//                                        buffer.append("is neigh %unknown command or computer name , or unable to find computer address");
+//                                        buffer.append(System.getProperty("line.separator"));
+//                                        
+//                                    }
                                 } catch (UnknownHostException ex) {
                                     buffer.append(lbl.getText() + " " + command);
                                     buffer.append(System.getProperty("line.separator"));
                                     buffer.append("address %unknown command or computer name , or unable to find computer address");
                                     buffer.append(System.getProperty("line.separator"));
+                                } catch (RemoteException ex) {
+                                    Logger.getLogger(VirtualRouterConfiguration.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             } else {
                                 buffer.append(lbl.getText() + " " + command);
@@ -411,10 +404,10 @@ public class VirtualRouterConfiguration extends Application {
                             }
                             break;
                         case "exit":
-                            if (establishedneighbors.size() > 0) {
+                            if (networks.size() > 0) {
                                 try {
                                     //initialize routing protocol
-                                    configurationinterface.initializeRoutingProtocol(establishedneighbors);
+                                    configurationinterface.initializeRoutingProtocol(networks);
                                 } catch (RemoteException ex) {
                                     buffer.append(lbl.getText() + " " + command);
                                     buffer.append(System.getProperty("line.separator"));
@@ -444,14 +437,20 @@ public class VirtualRouterConfiguration extends Application {
         });
 
         VBox rr = new VBox(3);
+
         rr.setVgrow(textArea, Priority.ALWAYS);
-        commandsbox.getChildren().addAll(lbl, txtcommand);
 
-        rr.getChildren().addAll(hostnameConnectionbox, textArea, commandsbox);
+        commandsbox.getChildren()
+                .addAll(lbl, txtcommand);
 
-        stage.setScene(new Scene(rr, 600, 250));
+        rr.getChildren()
+                .addAll(hostnameConnectionbox, textArea, commandsbox);
 
-        stage.setTitle("Configuration");
+        stage.setScene(
+                new Scene(rr, 600, 250));
+
+        stage.setTitle(
+                "Configuration");
 
         stage.show();
     }
