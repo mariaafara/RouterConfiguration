@@ -59,7 +59,10 @@ public class VirtualRouterConfiguration extends Application {
         txtRegistryPort.setPrefWidth(120);
         txtHostname.setPrefWidth(120);
         Button btnConnect = new Button("Connect");
-
+        Label ip = new Label();
+        TextField txtcommand = new TextField();
+        txtcommand.setDisable(true);
+        txtcommand.setPrefWidth(425);
         btnConnect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
@@ -72,6 +75,9 @@ public class VirtualRouterConfiguration extends Application {
                     txtRegistryPort.setDisable(true);
                     stage.setTitle("Configuration of router " + configurationinterface.getHostname());
                     txtHostname.setDisable(true);
+                    ip.setText(configurationinterface.getLocalHost().getHostAddress());
+                    txtcommand.setDisable(false);
+
                 } catch (RemoteException ex) {
                     Logger.getLogger(VirtualRouterConfiguration.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NotBoundException ex) {
@@ -79,7 +85,7 @@ public class VirtualRouterConfiguration extends Application {
                 }
             }
         });
-        hostnameConnectionbox.getChildren().addAll(txtHostname, txtRegistryPort, btnConnect);
+        hostnameConnectionbox.getChildren().addAll(txtHostname, txtRegistryPort, btnConnect, ip);
         ports = new ArrayList<>();
         neighbors = new ArrayList<>();
         establishedneighbors = new ArrayList<>();
@@ -92,9 +98,6 @@ public class VirtualRouterConfiguration extends Application {
         textArea.textProperty().bind(buffer);
 
         HBox commandsbox = new HBox();
-        TextField txtcommand = new TextField();
-
-        txtcommand.setPrefWidth(425);
 
         // buffer.append("Router#");
         txtcommand.setOnAction(e -> {
@@ -143,16 +146,18 @@ public class VirtualRouterConfiguration extends Application {
                                 System.out.println("size " + sizeofinterfaces);
                                 try {
                                     for (int j = 0; j < sizeofinterfaces - 1; j++) {
-                                        System.out.println("-" + config_command_array[j + 1]);
+
                                         ports.add(Integer.parseInt(config_command_array[j + 1]));
+                                        System.out.println("->" + config_command_array[j + 1] + " added");
                                     }
                                     for (int k = 0; k < ports.size(); k++) {
 
                                         //initializePort 
+                                        System.out.println("trying to initialize k=" + k);
                                         configurationinterface.initializePort(ports.get(k));
                                         System.out.println("interface " + ports.get(k) + " is initialized");
                                     }
-
+                                    System.out.println("interfaces.....");
                                     buffer.append(lbl.getText() + " " + command + System.getProperty("line.separator"));
 
                                 } catch (NumberFormatException efe) {
@@ -439,7 +444,7 @@ public class VirtualRouterConfiguration extends Application {
 
         rr.getChildren().addAll(hostnameConnectionbox, textArea, commandsbox);
 
-        stage.setScene(new Scene(rr, 550, 550));
+        stage.setScene(new Scene(rr, 600, 250));
 
         stage.setTitle("Configuration");
 
