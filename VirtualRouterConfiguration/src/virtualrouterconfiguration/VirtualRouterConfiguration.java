@@ -342,7 +342,12 @@ public class VirtualRouterConfiguration extends Application {
                     String first_config_router_command = config_router_command_array[0];
                     //network ip hostname
                     switch (first_config_router_command) {
+                        case "":
+                            buffer.append(lbl.getText() + " " + command);
+                            buffer.append(System.getProperty("line.separator"));
+                            break;
                         case "network":
+
                             if (config_router_command_array.length == 3) {
                                 try {
                                     InetAddress address = InetAddress.getByName(config_router_command_array[1]);
