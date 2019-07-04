@@ -6,13 +6,22 @@
 package virtualrouterconfiguration;
 
 import configuration.ConfigurationInterface;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -20,6 +29,7 @@ import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -28,6 +38,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import sharedPackage.RoutingTableKey;
 
@@ -48,7 +59,8 @@ public class VirtualRouterConfiguration extends Application {
     int port = -1;
 
     ConfigurationInterface configurationinterface;
-
+    static String currentHostIpAddress = null;
+    
     @Override
     public void start(Stage stage) throws RemoteException {
 
@@ -356,7 +368,7 @@ public class VirtualRouterConfiguration extends Application {
                                         networks.add(net);
                                         buffer.append(lbl.getText() + " " + command);
                                         buffer.append(System.getProperty("line.separator"));
-                                       
+
                                     }
 
                                     ////iza m3moul establish abel aw la lnetwork 
@@ -447,12 +459,49 @@ public class VirtualRouterConfiguration extends Application {
                 .addAll(hostnameConnectionbox, textArea, commandsbox);
 
         stage.setScene(
-                new Scene(rr, 600, 250));
+                new Scene(rr, 650, 250));
 
         stage.setTitle(
                 "Configuration");
 
         stage.show();
+    }
+     public String getCurrentEnvironmentNetworkIp() {
+
+        if (currentHostIpAddress == null) {
+            Enumeration<NetworkInterface> netInterfaces = null;
+            try {
+                netInterfaces = NetworkInterface.getNetworkInterfaces();
+
+                while (netInterfaces.hasMoreElements()) {
+                    NetworkInterface ni = netInterfaces.nextElement();
+                    //System.out.println(ni.getName());
+                    if (!ni.getName().contains("wlan")) {
+                        continue;
+                    }
+                    Enumeration<InetAddress> address = ni.getInetAddresses();
+                    while (address.hasMoreElements()) {
+                        InetAddress addr = address.nextElement();
+                        //                      log.debug("Inetaddress:" + addr.getHostAddress() + " loop? " + addr.isLoopbackAddress() + " local? "
+                        //                            + addr.isSiteLocalAddress());
+                        if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress()
+                                && !(addr.getHostAddress().indexOf(":") > -1)) {
+                            //System.out.println(addr);
+                            currentHostIpAddress = addr.getHostAddress();
+                            return currentHostIpAddress;
+                        }
+                    }
+                }
+                if (currentHostIpAddress == null) {
+                    currentHostIpAddress = "127.0.0.1";
+                }
+
+            } catch (SocketException e) {
+//                log.error("Somehow we have a socket error acquiring the host IP... Using loopback instead...");
+                currentHostIpAddress = "127.0.0.1";
+            }
+        }
+        return currentHostIpAddress;
     }
 
     /**
