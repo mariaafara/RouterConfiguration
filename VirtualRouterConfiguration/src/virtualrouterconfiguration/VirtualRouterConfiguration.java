@@ -363,12 +363,17 @@ public class VirtualRouterConfiguration extends Application {
                                     String nexthostname = config_router_command_array[2];
                                     RoutingTableKey net = new RoutingTableKey(address, nexthostname);
                                     //if its a neighbor but not established add to networks
+                            //        System.out.println("estb:"+configurationinterface.checkEstablishedNeighbor(address, nexthostname)+"   isNegh:"+configurationinterface.checkNeighbor(address, nexthostname));
                                     if (!configurationinterface.checkEstablishedNeighbor(address, nexthostname)
                                             && configurationinterface.checkNeighbor(address, nexthostname)) {
                                         networks.add(net);
                                         buffer.append(lbl.getText() + " " + command);
                                         buffer.append(System.getProperty("line.separator"));
 
+                                    }
+                                    else{
+                                      buffer.append("already exist or not a neighbor");
+                                        buffer.append(System.getProperty("line.separator"));
                                     }
 
                                     ////iza m3moul establish abel aw la lnetwork 
