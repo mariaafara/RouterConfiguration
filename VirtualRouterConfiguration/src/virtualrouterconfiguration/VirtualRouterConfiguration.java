@@ -79,6 +79,8 @@ public class VirtualRouterConfiguration extends Application {
             @Override
             public void handle(ActionEvent t) {
                 try {
+                    
+                    
                     Registry registry = LocateRegistry.getRegistry("localhost", Integer.parseInt(txtRegistryPort.getText()));
 
                     configurationinterface = (ConfigurationInterface) registry.lookup(txtHostname.getText());
@@ -127,7 +129,7 @@ public class VirtualRouterConfiguration extends Application {
                             lbl.setText("Router(config)#");
                             break;
 
-                        case "configuration terminal":
+                        case "configure terminal":
                             buffer.append(lbl.getText() + " " + command);
                             buffer.append(System.getProperty("line.separator"));
                             lbl.setText("Router(config)#");
