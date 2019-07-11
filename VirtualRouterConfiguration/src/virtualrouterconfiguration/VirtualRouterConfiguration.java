@@ -247,7 +247,8 @@ public class VirtualRouterConfiguration extends Application {
 
                         case "router":
                             String second_config_command;
-                            if (config_command_array.length == 2 && config_command_array[1].equals("rip")) {
+//                            Dynamic Routing Protocol drp
+                            if (config_command_array.length == 2 && config_command_array[1].equals("drp")) {
                                 second_config_command = config_command_array[1];
 
                                 buffer.append(lbl.getText() + " " + command);
