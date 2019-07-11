@@ -365,7 +365,7 @@ public class VirtualRouterConfiguration extends Application {
                                     String nexthostname = config_router_command_array[2];
                                     RoutingTableKey net = new RoutingTableKey(address, nexthostname);
                                     //if its a neighbor but not established add to networks
-                            //        System.out.println("estb:"+configurationinterface.checkEstablishedNeighbor(address, nexthostname)+"   isNegh:"+configurationinterface.checkNeighbor(address, nexthostname));
+                                  System.out.println("estb:"+configurationinterface.checkEstablishedNeighbor(address, nexthostname)+"   isNegh:"+configurationinterface.checkNeighbor(address, nexthostname));
                                     if (!configurationinterface.checkEstablishedNeighbor(address, nexthostname)
                                             && configurationinterface.checkNeighbor(address, nexthostname)) {
                                         networks.add(net);
