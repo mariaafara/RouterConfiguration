@@ -1,4 +1,7 @@
 # RouterConfiguration
+
+![RMIConfig](https://raw.githubusercontent.com/mariaafara/VirtualRouterConfiguration/master/src/image/RmiConfiguration.png)
+
 almost the same as the basic configuration of a router done in cisco
 
 config t or configuration terminal
