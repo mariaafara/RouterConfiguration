@@ -1,6 +1,6 @@
 # RouterConfiguration
 
-![RMIConfig](https://raw.githubusercontent.com/mariaafara/VirtualRouterConfiguration/master/src/image/RmiConfiguration.png)
+![RMIConfig](https://github.com/mariaafara/VirtualRouterConfiguration/tree/master/VirtualRouterConfiguration/src/image/RmiConfiguration.png)
 
 almost the same as the basic configuration of a router done in cisco
 
